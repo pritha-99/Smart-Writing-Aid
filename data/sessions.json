@@ -1,0 +1,32 @@
+[
+  {
+    "id": "3489af4e-ceed-465b-a4d8-611f629f670c",
+    "subject": "Pre-Integration Dry Run",
+    "start_time": "2026-04-09T10:40:42.467655+00:00",
+    "end_time": "2026-04-09T10:40:42.590376+00:00",
+    "writing_time": 0.02,
+    "watching_time": 0.11,
+    "focus_score": 12.84,
+    "total_time": 0.12
+  },
+  {
+    "id": "37b39f58-9166-4199-9f31-55a736b46e2d",
+    "subject": "Hardware Test",
+    "start_time": "2026-04-09T10:58:18.935644+00:00",
+    "end_time": "2026-04-09T10:58:19.624752+00:00",
+    "writing_time": 0.02,
+    "watching_time": 0.67,
+    "focus_score": 2.74,
+    "total_time": 0.69
+  },
+  {
+    "id": "29c28115-59fb-4825-97e3-5931b54a5724",
+    "subject": "General",
+    "start_time": "2026-04-16T09:16:22.456412+00:00",
+    "end_time": "2026-04-16T09:16:25.122235+00:00",
+    "writing_time": 0.0,
+    "watching_time": 2.67,
+    "focus_score": 0.0,
+    "total_time": 2.67
+  }
+]

@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smart Writing Aid</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="bg-glow"></div>
+    <main class="container">
+      <header class="hero">
+        <h1>Smart Writing Aid</h1>
+        <p>Local learning companion for pen-triggered video control and study analytics.</p>
+      </header>
+
+      <section class="panel">
+        <div class="status-row">
+          <div>
+            <span class="label">Pen Status</span>
+            <p id="deviceStatus" class="status-dot offline">Disconnected</p>
+          </div>
+          <div>
+            <span class="label">ESP Adapter</span>
+            <p id="espStatus" class="status-dot offline">Unknown</p>
+            <p id="espStatusDetails" class="muted">Last signal: - | Last poll: - | Error: none</p>
+          </div>
+          <div>
+            <span class="label">Current Mode</span>
+            <p id="sessionMode">Idle</p>
+          </div>
+          <div>
+            <span class="label">Focus Score</span>
+            <p id="focusScore">0%</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel grid-2">
+        <div>
+          <h2>Session Control</h2>
+          <div class="row">
+            <select id="subjectSelect"></select>
+            <input id="subjectInput" type="text" placeholder="New subject" />
+            <button id="addSubjectBtn">Add</button>
+          </div>
+          <div class="row">
+            <button id="startBtn" class="primary">Start Learning</button>
+            <button id="stopBtn" class="danger">Stop Session</button>
+            <button id="simulatePauseBtn">Simulate PAUSE</button>
+            <button id="simulatePlayBtn">Simulate PLAY</button>
+          </div>
+          <p id="sessionMessage" class="muted"></p>
+        </div>
+
+        <div>
+          <h2>Calibration</h2>
+          <div class="row">
+            <button id="autoCalibrateBtn" class="primary">Auto Calibrate (10s + 10s)</button>
+          </div>
+          <p id="calibrationResult" class="muted"></p>
+          <p id="autoCalibrationStatus" class="muted"></p>
+        </div>
+      </section>
+
+      <section class="panel grid-2">
+        <div>
+          <h2>Session History</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Subject</th>
+                <th>Total</th>
+                <th>Focus</th>
+              </tr>
+            </thead>
+            <tbody id="historyTable"></tbody>
+          </table>
+        </div>
+
+        <div>
+          <h2>Screenshots</h2>
+          <div class="row">
+            <button id="captureBtn">Capture Screenshot</button>
+          </div>
+          <ul id="screenshotsList" class="list"></ul>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Debug Feed</h2>
+        <ul id="debugList" class="list"></ul>
+      </section>
+    </main>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,33 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #2f4d74 #111c2e;
+}
+
+body {
+  margin: 0;
+  font-family: "Manrope", "Segoe UI", sans-serif;
+  color: #e6edf7;
+  background:
+    radial-gradient(1200px 800px at 8% -10%, rgba(83, 162, 255, 0.2), transparent 45%),
+    radial-gradient(900px 550px at 90% 0%, rgba(49, 139, 255, 0.12), transparent 45%),
+    #060b17;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.glass {
+  @apply border border-white/10 bg-surface-850/75 backdrop-blur-lg;
+}
