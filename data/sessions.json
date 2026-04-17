@@ -28,5 +28,85 @@
     "watching_time": 2.67,
     "focus_score": 0.0,
     "total_time": 2.67
+  },
+  {
+    "id": "7f41fa5b-b961-4669-ac87-8294766a8fec",
+    "subject": "General",
+    "start_time": "2026-04-17T16:10:00.824017+00:00",
+    "end_time": "2026-04-17T16:10:07.531982+00:00",
+    "writing_time": 0.0,
+    "watching_time": 6.71,
+    "focus_score": 0.0,
+    "total_time": 6.71
+  },
+  {
+    "id": "0644bf32-160e-4bc4-b43a-ad1fc6256a98",
+    "subject": "General",
+    "start_time": "2026-04-17T16:56:52.790600+00:00",
+    "end_time": "2026-04-17T16:56:53.901677+00:00",
+    "writing_time": 0.0,
+    "watching_time": 1.11,
+    "focus_score": 0.0,
+    "total_time": 1.11
+  },
+  {
+    "id": "a820bec4-7224-40a7-bae0-0879e94b1af0",
+    "subject": "General",
+    "start_time": "2026-04-17T17:26:15.231347+00:00",
+    "end_time": "2026-04-17T17:26:21.299517+00:00",
+    "writing_time": 0.0,
+    "watching_time": 6.07,
+    "focus_score": 0.0,
+    "total_time": 6.07
+  },
+  {
+    "id": "e706d702-89a0-41ad-b4d6-a9516be24b04",
+    "subject": "General",
+    "start_time": "2026-04-17T17:32:13.351068+00:00",
+    "end_time": "2026-04-17T17:32:19.189505+00:00",
+    "writing_time": 0.0,
+    "watching_time": 5.84,
+    "focus_score": 0.0,
+    "total_time": 5.84
+  },
+  {
+    "id": "781a8a55-a0e4-49ce-9dcc-b04ec2df1a54",
+    "subject": "General",
+    "start_time": "2026-04-17T20:42:14.519413+00:00",
+    "end_time": "2026-04-17T20:42:58.815047+00:00",
+    "writing_time": 3.77,
+    "watching_time": 40.52,
+    "focus_score": 8.52,
+    "total_time": 44.3
+  },
+  {
+    "id": "2ab029c7-b3ae-499f-9ff6-1a608d538c24",
+    "subject": "General",
+    "start_time": "2026-04-17T21:39:14.569877+00:00",
+    "end_time": "2026-04-17T21:39:19.377111+00:00",
+    "writing_time": 0.0,
+    "watching_time": 4.81,
+    "focus_score": 0.0,
+    "total_time": 4.81
+  },
+  {
+    "id": "8464848d-a453-4283-84d7-cfabacf77681",
+    "subject": "General",
+    "start_time": "2026-04-17T21:43:54.345983+00:00",
+    "end_time": "2026-04-17T21:44:02.257016+00:00",
+    "writing_time": 0.0,
+    "watching_time": 7.91,
+    "focus_score": 0.0,
+    "total_time": 7.91
+  },
+  {
+    "id": "471d35a3-e00a-4e5f-896a-0ac41ff1997e",
+    "subject": "General",
+    "start_time": "2026-04-17T21:54:00.735257+00:00",
+    "end_time": "2026-04-17T21:55:10.543782+00:00",
+    "writing_time": 5.77,
+    "watching_time": 64.04,
+    "focus_score": 8.27,
+    "total_time": 69.81
   }
 ]

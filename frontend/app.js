@@ -86,9 +86,89 @@ async function refreshScreenshots() {
   list.innerHTML = "";
   shots.slice(0, 20).forEach((shot) => {
     const item = document.createElement("li");
-    item.textContent = `${new Date(shot.timestamp).toLocaleString()} - ${shot.subject} - ${shot.file_path}`;
+    const title = document.createElement("button");
+    title.type = "button";
+    title.className = "shot-link";
+    title.textContent = `${new Date(shot.timestamp).toLocaleString()} - ${shot.subject}`;
+
+    if (shot.public_url) {
+      title.onclick = () => showScreenshotModal(shot);
+      const preview = document.createElement("img");
+      preview.src = shot.public_url;
+      preview.alt = shot.subject;
+      preview.className = "shot-thumb";
+      preview.loading = "lazy";
+      preview.onclick = () => showScreenshotModal(shot);
+      item.appendChild(preview);
+    }
+
+    const path = document.createElement("p");
+    path.className = "muted shot-path";
+    path.textContent = shot.file_path || "No file path";
+
+    item.appendChild(title);
+    item.appendChild(path);
     list.appendChild(item);
   });
+}
+
+function showScreenshotModal(shot) {
+  const overlay = document.createElement("div");
+  overlay.className = "shot-modal-overlay";
+
+  const modal = document.createElement("div");
+  modal.className = "shot-modal";
+
+  const heading = document.createElement("h3");
+  heading.textContent = `${shot.subject} - ${new Date(shot.timestamp).toLocaleString()}`;
+
+  const body = document.createElement("div");
+  body.className = "shot-modal-body";
+
+  if (shot.public_url) {
+    const image = document.createElement("img");
+    image.src = shot.public_url;
+    image.alt = shot.subject;
+    image.className = "shot-modal-image";
+    body.appendChild(image);
+  } else {
+    const pathText = document.createElement("p");
+    pathText.className = "muted";
+    pathText.textContent = shot.file_path || "Screenshot file unavailable";
+    body.appendChild(pathText);
+  }
+
+  const footer = document.createElement("div");
+  footer.className = "shot-modal-footer";
+
+  const openNew = document.createElement("a");
+  openNew.href = shot.public_url || "#";
+  openNew.target = "_blank";
+  openNew.rel = "noreferrer";
+  openNew.textContent = "Open in new tab";
+  openNew.className = "shot-link";
+  if (!shot.public_url) {
+    openNew.style.pointerEvents = "none";
+    openNew.style.opacity = "0.6";
+  }
+
+  const closeBtn = document.createElement("button");
+  closeBtn.type = "button";
+  closeBtn.textContent = "Close";
+  closeBtn.onclick = () => document.body.removeChild(overlay);
+
+  footer.appendChild(openNew);
+  footer.appendChild(closeBtn);
+
+  modal.appendChild(heading);
+  modal.appendChild(body);
+  modal.appendChild(footer);
+  overlay.appendChild(modal);
+
+  overlay.onclick = () => document.body.removeChild(overlay);
+  modal.onclick = (event) => event.stopPropagation();
+
+  document.body.appendChild(overlay);
 }
 
 async function refreshDebug() {

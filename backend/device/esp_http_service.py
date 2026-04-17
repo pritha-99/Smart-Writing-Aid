@@ -4,6 +4,7 @@ import asyncio
 from datetime import datetime, timezone
 from threading import Event, Thread
 from threading import Lock
+from time import monotonic
 from time import sleep
 from typing import Any
 
@@ -21,12 +22,14 @@ class EspHttpService:
         url: str,
         timeout_seconds: float,
         poll_interval_seconds: float,
+        shot_rearm_seconds: float,
     ) -> None:
         self._device_service = device_service
         self._debug_service = debug_service
         self._url = url
         self._timeout_seconds = timeout_seconds
         self._poll_interval_seconds = poll_interval_seconds
+        self._shot_rearm_seconds = max(0.1, shot_rearm_seconds)
 
         self._loop: asyncio.AbstractEventLoop | None = None
         self._thread: Thread | None = None
@@ -35,6 +38,7 @@ class EspHttpService:
 
         self._last_state: str | None = None
         self._last_shot = False
+        self._last_shot_at = 0.0
         self._last_poll_at: datetime | None = None
         self._last_signal: str | None = None
         self._last_error = ""
@@ -47,6 +51,7 @@ class EspHttpService:
                 "url": self._url,
                 "timeout_seconds": self._timeout_seconds,
                 "poll_interval_seconds": self._poll_interval_seconds,
+                "shot_rearm_seconds": self._shot_rearm_seconds,
                 "last_poll_at": self._last_poll_at.isoformat() if self._last_poll_at else None,
                 "last_signal": self._last_signal,
                 "last_error": self._last_error or None,
@@ -112,9 +117,11 @@ class EspHttpService:
 
         # Fire SHOT only once while the source keeps sending SHOT.
         if data == "SHOT":
-            if self._last_shot:
+            now = monotonic()
+            if self._last_shot and (now - self._last_shot_at) < self._shot_rearm_seconds:
                 return None
             self._last_shot = True
+            self._last_shot_at = now
             return "SHOT"
 
         self._last_shot = False

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { api, wsUrl } from "../services/api";
+import { api, mediaUrl, wsUrl } from "../services/api";
 import { useLiveTimer } from "./useLiveTimer";
 
 function formatDuration(seconds) {
@@ -24,8 +24,9 @@ function mapScreenshots(items) {
     id: shot.id || `${shot.timestamp}-${index}`,
     subject: shot.subject,
     timestamp: new Date(shot.timestamp).toLocaleString(),
-    thumbnail: null,
+    thumbnail: mediaUrl(shot.public_url),
     filePath: shot.file_path,
+    publicUrl: mediaUrl(shot.public_url),
   }));
 }
 
@@ -72,6 +73,30 @@ export function useBackendAppData() {
 
   const [message, setMessage] = useState("");
 
+  const applyDeviceAndSession = useCallback((prev, device, active) => {
+    const writing = Number(active?.writing_time || 0);
+    const watching = Number(active?.watching_time || 0);
+    const total = writing + watching;
+
+    return {
+      ...prev,
+      penStatus: device.connected ? "connected" : "disconnected",
+      sessionState: active?.mode || "idle",
+      currentSubject: active?.subject || "General",
+      activeSessionId: active?.id || null,
+      liveTimerSeconds: total,
+      analytics: {
+        ...prev.analytics,
+        totalTimeSeconds: total,
+        writingTimeSeconds: writing,
+        watchingTimeSeconds: watching,
+        focusScore: Number(active?.focus_score || 0),
+        totalLabel: formatDuration(total),
+        writingLabel: formatDuration(writing),
+      },
+    };
+  }, []);
+
   const refresh = useCallback(async () => {
     const [device, active, sessions, subjects, screenshots, logs, calStatus] = await Promise.all([
       api("/device/status"),
@@ -89,14 +114,10 @@ export function useBackendAppData() {
     const latestCal = calStatus?.latest_setup || calStatus?.latest || calStatus?.result || null;
 
     setData((prev) => ({
-      ...prev,
-      penStatus: device.connected ? "connected" : "disconnected",
-      sessionState: active?.mode || "idle",
-      currentSubject: active?.subject || "General",
-      activeSessionId: active?.id || null,
-      liveTimerSeconds: total,
+      ...applyDeviceAndSession(prev, device, active),
       subjects: (subjects || []).map((item) => item.name),
       analytics: {
+        ...prev.analytics,
         totalTimeSeconds: total,
         writingTimeSeconds: writing,
         watchingTimeSeconds: watching,
@@ -118,7 +139,12 @@ export function useBackendAppData() {
         .slice(0, 10),
       debugLogs: mapDebug(logs),
     }));
-  }, []);
+  }, [applyDeviceAndSession]);
+
+  const refreshRealtime = useCallback(async () => {
+    const [device, active] = await Promise.all([api("/device/status"), api("/session/active")]);
+    setData((prev) => applyDeviceAndSession(prev, device, active));
+  }, [applyDeviceAndSession]);
 
   const runAction = useCallback(
     async (runner, successMessage) => {
@@ -139,6 +165,10 @@ export function useBackendAppData() {
     let pingId = null;
     refresh().catch((error) => setMessage(error.message));
 
+    const fastIntervalId = window.setInterval(() => {
+      refreshRealtime().catch(() => {});
+    }, 800);
+
     const intervalId = window.setInterval(() => {
       refresh().catch(() => {});
     }, 3000);
@@ -152,11 +182,12 @@ export function useBackendAppData() {
     };
 
     return () => {
+      window.clearInterval(fastIntervalId);
       window.clearInterval(intervalId);
       if (pingId) window.clearInterval(pingId);
       ws.close();
     };
-  }, [refresh]);
+  }, [refresh, refreshRealtime]);
 
   const startSession = useCallback(
     async (subject) => {
@@ -183,7 +214,7 @@ export function useBackendAppData() {
   const stopSession = useCallback(async () => {
     const stopped = await runAction(() => api("/session/stop", { method: "POST" }));
     if (stopped) {
-      setMessage(`Session stopped. Focus score: ${stopped.focus_score}%`);
+      setMessage(`Session stopped. Writing score: ${stopped.focus_score}%`);
     }
   }, [runAction]);
 

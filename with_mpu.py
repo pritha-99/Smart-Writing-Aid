@@ -4,13 +4,18 @@ import time
 import os
 from datetime import datetime
 
-ESP_IP = "10.251.100.160"   # replace with your ESP IP
-SAVE_FOLDER = r"/home/pritha/ptt"
+ESP_IP = "10.251.100.160"
+SAVE_FOLDER = "/home/pritha/ptt/screenshots"
 
-os.makedirs(SAVE_FOLDER, exist_ok=True) 
+os.makedirs(SAVE_FOLDER, exist_ok=True)
 
 last_state = None
 last_shot = False
+last_forward_time = 0
+
+forward_cooldown = 0.001  
+
+pyautogui.FAILSAFE = False
 
 while True:
     try:
@@ -34,8 +39,8 @@ while True:
             filename = datetime.now().strftime("screenshot_%Y%m%d_%H%M%S.png")
             filepath = os.path.join(SAVE_FOLDER, filename)
 
-            img = pyautogui.screenshot()  # capture
-            img.save(filepath)  # explicit write
+            img = pyautogui.screenshot()
+            img.save(filepath)
 
             print(f"Saved at: {filepath}")
             print("File exists?", os.path.exists(filepath))
@@ -45,14 +50,17 @@ while True:
         elif data != "SHOT":
             last_shot = False
 
+        # ===== FORWARD =====
+        if data == "FORWARD":
+            now = time.time()
+            if now - last_forward_time > forward_cooldown:
+                pyautogui.press("l")
+                last_forward_time = now
 
     except requests.exceptions.RequestException as e:
-
         print("ESP connection error:", e)
 
-
     except Exception as e:
-
         print("Other error:", e)
 
     time.sleep(0.2)

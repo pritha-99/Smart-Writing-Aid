@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from contextlib import asynccontextmanager
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -18,9 +19,12 @@ from backend.config import (
     DEVICE_TIMEOUT_SECONDS,
     ESP_ENABLED,
     ESP_POLL_INTERVAL_SECONDS,
+    ESP_SHOT_REARM_SECONDS,
     ESP_TIMEOUT_SECONDS,
     ESP_URL,
     FRONTEND_DIR,
+    SCREENSHOTS_DIR,
+    SCREENSHOTS_PUBLIC_PREFIX,
     SERIAL_BAUDRATE,
     SERIAL_PORT,
 )
@@ -115,6 +119,7 @@ async def lifespan(app: FastAPI):
         url=ESP_URL,
         timeout_seconds=ESP_TIMEOUT_SECONDS,
         poll_interval_seconds=ESP_POLL_INTERVAL_SECONDS,
+        shot_rearm_seconds=ESP_SHOT_REARM_SECONDS,
     )
     health_monitor = DeviceHealthMonitor(device_service, DEVICE_TIMEOUT_SECONDS)
 
@@ -201,6 +206,9 @@ app.add_middleware(
 if FRONTEND_DIR.exists():
     app.mount("/static", StaticFiles(directory=str(FRONTEND_DIR)), name="static")
 
+if SCREENSHOTS_DIR.exists():
+    app.mount(SCREENSHOTS_PUBLIC_PREFIX, StaticFiles(directory=str(SCREENSHOTS_DIR)), name="screenshot-files")
+
 
 @app.get("/")
 def index() -> FileResponse:
@@ -245,7 +253,36 @@ def active_session() -> dict[str, Any] | None:
 
 @app.get("/device/status")
 def device_status() -> dict[str, Any]:
-    return app.state.device_service.status()
+    serial_status = app.state.device_service.status()
+    esp_status = app.state.esp_service.status()
+
+    # In ESP mode there is no serial connection, so report connectivity based on
+    # active polling + recent successful polls.
+    esp_recent = False
+    last_poll_raw = esp_status.get("last_poll_at")
+    if last_poll_raw:
+        try:
+            last_poll = datetime.fromisoformat(last_poll_raw)
+            recency_window = max(2.0, ESP_TIMEOUT_SECONDS + (ESP_POLL_INTERVAL_SECONDS * 2.0))
+            esp_recent = (datetime.now(timezone.utc) - last_poll).total_seconds() <= recency_window
+        except Exception:
+            esp_recent = False
+
+    esp_connected = bool(esp_status.get("running") and esp_recent)
+    connected = bool(serial_status.get("connected") or esp_connected)
+
+    return {
+        **serial_status,
+        "connected": connected,
+        "source": "serial" if serial_status.get("connected") else "esp" if esp_connected else "none",
+        "esp": {
+            "enabled": esp_status.get("enabled"),
+            "running": esp_status.get("running"),
+            "last_poll_at": esp_status.get("last_poll_at"),
+            "last_signal": esp_status.get("last_signal"),
+            "last_error": esp_status.get("last_error"),
+        },
+    }
 
 
 @app.get("/device/esp/status")

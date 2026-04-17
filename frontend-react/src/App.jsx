@@ -4,16 +4,12 @@ import DebugPanel from "./components/DebugPanel";
 import DashboardPage from "./pages/DashboardPage";
 import HistoryPage from "./pages/HistoryPage";
 import ScreenshotsPage from "./pages/ScreenshotsPage";
-import ResourcesPage from "./pages/ResourcesPage";
-import CalibrationPage from "./pages/CalibrationPage";
 import { useBackendAppData } from "./hooks/useBackendAppData";
 
 const NAV_ITEMS = [
   { key: "dashboard", label: "Dashboard" },
   { key: "history", label: "History" },
   { key: "screenshots", label: "Screenshots" },
-  { key: "resources", label: "Resources" },
-  { key: "calibration", label: "Calibration" },
 ];
 
 export default function App() {
@@ -24,10 +20,6 @@ export default function App() {
   const pageNode = useMemo(() => {
     if (activePage === "history") return <HistoryPage data={appData} />;
     if (activePage === "screenshots") return <ScreenshotsPage data={appData} />;
-    if (activePage === "resources") return <ResourcesPage data={appData} />;
-    if (activePage === "calibration") {
-      return <CalibrationPage data={appData} onAutoCalibrate={appData.actions.startAutoCalibration} />;
-    }
     return <DashboardPage data={appData} actions={appData.actions} message={appData.message} />;
   }, [activePage, appData]);
 

@@ -43,7 +43,7 @@ export default function HistoryPage({ data }) {
               <th className="px-4 py-3">Date</th>
               <th className="px-4 py-3">Subject</th>
               <th className="px-4 py-3">Duration</th>
-              <th className="px-4 py-3">Focus Score</th>
+              <th className="px-4 py-3">Writing Score</th>
             </tr>
           </thead>
           <tbody>

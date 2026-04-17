@@ -12,6 +12,13 @@ function buildUrl(path) {
   return `${API_BASE}${path}`;
 }
 
+export function mediaUrl(path) {
+  if (!path) return null;
+  if (/^https?:\/\//i.test(path)) return path;
+  const normalized = path.startsWith("/") ? path : `/${path}`;
+  return buildUrl(normalized);
+}
+
 export async function api(path, options = {}) {
   const response = await fetch(buildUrl(path), {
     headers: { "Content-Type": "application/json" },
