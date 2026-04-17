@@ -70,7 +70,12 @@ export default function App() {
         <div className="animate-floatUp">{pageNode}</div>
       </main>
 
-      <DebugPanel open={debugOpen} logs={appData.debugLogs} rawValues={appData.rawSensorValues} />
+      <DebugPanel
+        open={debugOpen}
+        logs={appData.debugLogs}
+        rawValues={appData.rawSensorValues}
+        connectionSource={appData.connectionSource}
+      />
     </div>
   );
 }

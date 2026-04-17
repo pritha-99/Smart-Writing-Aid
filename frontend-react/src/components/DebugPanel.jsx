@@ -1,4 +1,4 @@
-export default function DebugPanel({ open, logs, rawValues }) {
+export default function DebugPanel({ open, logs, rawValues, connectionSource }) {
   return (
     <aside
       className={`glass fixed right-3 top-3 z-30 w-[330px] max-w-[90vw] rounded-2xl p-4 shadow-soft transition-all duration-300 ${
@@ -20,6 +20,7 @@ export default function DebugPanel({ open, logs, rawValues }) {
         {logs.map((entry) => (
           <div key={entry.id} className="rounded-lg bg-white/5 p-2 text-xs">
             <p className="font-medium text-slate-200">{entry.signal}</p>
+            {connectionSource === "serial" && entry.detail ? <p className="text-slate-300">{entry.detail}</p> : null}
             <p className="text-slate-400">{entry.timestamp}</p>
           </div>
         ))}

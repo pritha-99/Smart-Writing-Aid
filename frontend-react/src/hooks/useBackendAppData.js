@@ -30,17 +30,24 @@ function mapScreenshots(items) {
   }));
 }
 
-function mapDebug(logs) {
-  return (logs || []).slice(0, 30).map((entry, index) => ({
-    id: `${entry.timestamp}-${index}`,
-    signal: entry.event,
-    timestamp: new Date(entry.timestamp).toLocaleTimeString(),
-  }));
+function mapDebug(logs, isSerialSource) {
+  return (logs || []).slice(0, 30).map((entry, index) => {
+    const details = entry?.details || {};
+    const serialDetail = details.message ?? details.signal ?? details.error ?? details.reason ?? null;
+
+    return {
+      id: `${entry.timestamp}-${index}`,
+      signal: entry.event,
+      detail: isSerialSource ? serialDetail : null,
+      timestamp: new Date(entry.timestamp).toLocaleTimeString(),
+    };
+  });
 }
 
 export function useBackendAppData() {
   const [data, setData] = useState({
     penStatus: "connecting",
+    connectionSource: "none",
     sessionState: "idle",
     currentSubject: "General",
     activeSessionId: null,
@@ -81,6 +88,7 @@ export function useBackendAppData() {
     return {
       ...prev,
       penStatus: device.connected ? "connected" : "disconnected",
+      connectionSource: device?.source || "none",
       sessionState: active?.mode || "idle",
       currentSubject: active?.subject || "General",
       activeSessionId: active?.id || null,
@@ -137,7 +145,7 @@ export function useBackendAppData() {
         .map((entry) => entry?.details?.pressure)
         .filter((v) => typeof v === "number")
         .slice(0, 10),
-      debugLogs: mapDebug(logs),
+      debugLogs: mapDebug(logs, device?.source === "serial"),
     }));
   }, [applyDeviceAndSession]);
 

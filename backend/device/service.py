@@ -3,10 +3,11 @@ from __future__ import annotations
 import asyncio
 from datetime import datetime, timezone
 from threading import Event, Lock, Thread
+from time import monotonic
 from time import sleep
 from typing import Any
 
-from backend.config import RECONNECT_SECONDS
+from backend.config import RECONNECT_SECONDS, SERIAL_SHOT_REARM_SECONDS
 from backend.debug.service import DebugService
 from backend.events import EventBus
 
@@ -37,6 +38,7 @@ class DeviceService:
         self._connected = False
         self._last_signal_at: datetime | None = None
         self._last_error = ""
+        self._last_shot_at = 0.0
         self._lock = Lock()
 
     def start(self) -> None:
@@ -91,7 +93,14 @@ class DeviceService:
         elif signal_upper == "PLAY":
             await self._event_bus.emit("on_play_signal", {"signal": signal_upper})
         elif signal_upper == "SHOT":
-            await self._event_bus.emit("on_screenshot_signal", {"signal": signal_upper})
+            # Debounce repeated SHOT lines from serial firmware loops.
+            now = monotonic()
+            with self._lock:
+                should_emit = (now - self._last_shot_at) >= max(0.1, SERIAL_SHOT_REARM_SECONDS)
+                if should_emit:
+                    self._last_shot_at = now
+            if should_emit:
+                await self._event_bus.emit("on_screenshot_signal", {"signal": signal_upper})
         elif signal_upper.startswith("PRESSURE:"):
             raw_value = normalized.split(":", 1)[1].strip()
             try:
